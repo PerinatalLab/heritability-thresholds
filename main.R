@@ -6,24 +6,20 @@ library(tidyr)
 library(ggplot2)
 library(boot)
 
-# TODO: replace this with proper cleanup script
-load("/home/dominika/mfr.Rdata")
+## raw mfr
+load("~/data/swed/ali/mfr14_aliids_basics.RData")
 
 # remove missing individual ids
-mfr = mfr %>% filter(lpnr_barn!=0, lpnr_mor!=0, !is.na(lpnr_far)) 
+mfull = r %>% filter(lpnr_barn!=0, lpnr_mor!=0, !is.na(lpnr_far)) 
 
 # maternal nationality, leave only european mothers
-mfr = mfr %>% filter(MFODLAND=="BELGIEN" | MFODLAND=="BOSNIEN-HERCEGOVINA" |  MFODLAND=="BULGARIEN" | MFODLAND=="DANMARK" | MFODLAND=="ESTLAND" | MFODLAND=="FINLAND" | MFODLAND=="FRANKRIKE"
+mfr = mfull %>% filter(MFODLAND=="BELGIEN" | MFODLAND=="BOSNIEN-HERCEGOVINA" |  MFODLAND=="BULGARIEN" | MFODLAND=="DANMARK" | MFODLAND=="ESTLAND" | MFODLAND=="FINLAND" | MFODLAND=="FRANKRIKE"
                        | MFODLAND=="GREKLAND" | MFODLAND=="IRLAND" | MFODLAND=="ISLAND" | MFODLAND=="ITALIEN" | MFODLAND=="JUGOSLAVIEN" | MFODLAND=="LITAUEN" | MFODLAND=="LUXEMBURG"
                        | MFODLAND=="MOLDAVIEN" | MFODLAND=="NEDERLANDERNA" | MFODLAND=="NORGE"  | MFODLAND=="OSTERRIKE" | MFODLAND=="POLEN" | MFODLAND=="PORTUGAL" |
                          MFODLAND=="RUMANIEN" | MFODLAND=="SERBIEN" | MFODLAND=="SLOVAKIEN" | MFODLAND=="SLOVENIEN" | MFODLAND=="SPANIEN" | MFODLAND=="STORBRITANNIEN OCH NORDIRLAND" | 
                          MFODLAND=="SVERIGE" | MFODLAND=="SWAZILAND" | MFODLAND=="TURKIET" | MFODLAND=="TYSKA DEM REP (DDR)" | MFODLAND=="TYSKLAND" | MFODLAND=="UKRAINA")
 
-
-## load full mfr (ali's) for sib-pair identification
-mfull = read.table("~/data/swed/ali/mfr14_aliids_onlyga.csv", h=T, sep=";")
-mfull = filter(mfull, lpnr_barn>0, lpnr_mor>0, !is.na(lpnr_far))
-
+# identify sibpairs
 sisters = filter(mfull, KON==2) %>%
 	inner_join(., ., by=c("lpnr_mor", "lpnr_far")) %>%
 	filter(lpnr_barn.x<lpnr_barn.y) %>%
@@ -35,7 +31,7 @@ brothers = filter(mfull, KON==1) %>%
 colnames(sisters) = colnames(brothers) = c("sib1", "sib2")
 
 # basic cleanup of MFR
-mfr = filter(mfr, GRDBS>150, mult_pregn==0)
+mfr = filter(mfr, GRDBS>150, BORDF2==1)
 
 # leave only one sibling
 onesib = group_by(mfr, lpnr_mor) %>% sample_n(size=1) %>% ungroup()
