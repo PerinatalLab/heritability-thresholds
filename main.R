@@ -9,6 +9,17 @@ library(boot)
 # TODO: replace this with proper cleanup script
 load("/home/dominika/mfr.Rdata")
 
+# remove missing individual ids
+mfr = mfr %>% filter(lpnr_barn!=0, lpnr_mor!=0, !is.na(lpnr_far)) 
+
+# maternal nationality, leave only european mothers
+mfr = mfr %>% filter(MFODLAND=="BELGIEN" | MFODLAND=="BOSNIEN-HERCEGOVINA" |  MFODLAND=="BULGARIEN" | MFODLAND=="DANMARK" | MFODLAND=="ESTLAND" | MFODLAND=="FINLAND" | MFODLAND=="FRANKRIKE"
+                       | MFODLAND=="GREKLAND" | MFODLAND=="IRLAND" | MFODLAND=="ISLAND" | MFODLAND=="ITALIEN" | MFODLAND=="JUGOSLAVIEN" | MFODLAND=="LITAUEN" | MFODLAND=="LUXEMBURG"
+                       | MFODLAND=="MOLDAVIEN" | MFODLAND=="NEDERLANDERNA" | MFODLAND=="NORGE"  | MFODLAND=="OSTERRIKE" | MFODLAND=="POLEN" | MFODLAND=="PORTUGAL" |
+                         MFODLAND=="RUMANIEN" | MFODLAND=="SERBIEN" | MFODLAND=="SLOVAKIEN" | MFODLAND=="SLOVENIEN" | MFODLAND=="SPANIEN" | MFODLAND=="STORBRITANNIEN OCH NORDIRLAND" | 
+                         MFODLAND=="SVERIGE" | MFODLAND=="SWAZILAND" | MFODLAND=="TURKIET" | MFODLAND=="TYSKA DEM REP (DDR)" | MFODLAND=="TYSKLAND" | MFODLAND=="UKRAINA")
+
+
 ## load full mfr (ali's) for sib-pair identification
 mfull = read.table("~/data/swed/ali/mfr14_aliids_onlyga.csv", h=T, sep=";")
 mfull = filter(mfull, lpnr_barn>0, lpnr_mor>0, !is.na(lpnr_far))
